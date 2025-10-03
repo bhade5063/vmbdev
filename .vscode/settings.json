@@ -1,8 +1,11 @@
-{
+I {
   "search.exclude": {
     "**/node_modules": true,
     "**/bower_components": true,
     "**/.sf": true,
     "**/.sfdx": true
   }
+  ,
+  "vlocode.org": "ShiDevOrg",
+  "xml.preferences.showSchemaDocumentationType": "none"
 }
