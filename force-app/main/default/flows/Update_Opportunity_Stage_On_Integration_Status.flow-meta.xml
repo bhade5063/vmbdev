@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>58.0</apiVersion>
+    <description>Updates the Opportunity Stage when Product_Opportunity__c Integration Status changes</description>
+    <interviewLabel>Update Opportunity Stage On Integration Status {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>Update Opportunity Stage On Integration Status</label>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <start>
+        <locationX>50</locationX>
+        <locationY>50</locationY>
+        <object>Product_Opportunity__c</object>
+        <recordTriggerType>CreateAndUpdate</recordTriggerType>
+        <triggerType>RecordAfterSave</triggerType>
+    </start>
+    <decisions>
+        <name>Check_Integration_Status</name>
+        <label>Check Integration Status</label>
+        <locationX>200</locationX>
+        <locationY>150</locationY>
+        <defaultConnector>
+            <targetReference>No_Action_Needed</targetReference>
+        </defaultConnector>
+        <defaultConnectorLabel>No Change</defaultConnectorLabel>
+        <rules>
+            <name>Success_Status</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.Integration_Status__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Success</stringValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Update_Opportunity_Success</targetReference>
+            </connector>
+            <label>Success Status</label>
+        </rules>
+        <rules>
+            <name>Failure_Status</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.Integration_Status__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Failure</stringValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Update_Opportunity_Failure</targetReference>
+            </connector>
+            <label>Failure Status</label>
+        </rules>
+    </decisions>
+    <recordUpdates>
+        <name>Update_Opportunity_Success</name>
+        <label>Update Opportunity - Success</label>
+        <locationX>400</locationX>
+        <locationY>100</locationY>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Id</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>$Record.Opportunity__r.Id</elementReference>
+            </value>
+        </filters>
+        <object>Opportunity</object>
+        <inputAssignments>
+            <field>StageName</field>
+            <value>
+                <stringValue>Closed Won</stringValue>
+            </value>
+        </inputAssignments>
+    </recordUpdates>
+    <recordUpdates>
+        <name>Update_Opportunity_Failure</name>
+        <label>Update Opportunity - Failure</label>
+        <locationX>400</locationX>
+        <locationY>200</locationY>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Id</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>$Record.Opportunity__r.Id</elementReference>
+            </value>
+        </filters>
+        <object>Opportunity</object>
+        <inputAssignments>
+            <field>StageName</field>
+            <value>
+                <stringValue>Closed Lost</stringValue>
+            </value>
+        </inputAssignments>
+    </recordUpdates>
+    <assignments>
+        <name>No_Action_Needed</name>
+        <label>No Action Needed</label>
+        <locationX>400</locationX>
+        <locationY>300</locationY>
+        <assignmentItems>
+            <assignToReference>$Flow.CurrentRecord</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>$Record</elementReference>
+            </value>
+        </assignmentItems>
+    </assignments>
+    <status>Active</status>
+</Flow>
